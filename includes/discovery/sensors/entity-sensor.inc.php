@@ -33,6 +33,14 @@ if (! empty($entity_array)) {
         $entity_oids = snmpwalk_cache_oid($device, 'entAliasMappingIdentifier', $entity_oids, 'ENTITY-MIB');
         echo ' XOS:ifName';
         $xos_ifname = snmpwalk_cache_oid($device, 'ifName', [], 'IF-MIB');
+        echo ' etsysEntitySfpSensorHighAlarm';
+        $xos_sensor_limit = snmpwalk_cache_oid($device, 'etsysEntitySfpSensorHighAlarm', [], 'ENTERASYS-ENTITY-SENSOR-MIB-EXT-MIB');
+        echo ' etsysEntitySfpSensorHighWarning';
+        $xos_sensor_limit = snmpwalk_cache_oid($device, 'etsysEntitySfpSensorHighWarning', $xos_sensor_limit, 'ENTERASYS-ENTITY-SENSOR-MIB-EXT-MIB');
+        echo ' etsysEntitySfpSensorLowWarning';
+        $xos_sensor_limit = snmpwalk_cache_oid($device, 'etsysEntitySfpSensorLowWarning', $xos_sensor_limit, 'ENTERASYS-ENTITY-SENSOR-MIB-EXT-MIB');
+        echo ' etsysEntitySfpSensorLowAlarm';
+        $xos_sensor_limit = snmpwalk_cache_oid($device, 'etsysEntitySfpSensorLowAlarm', $xos_sensor_limit, 'ENTERASYS-ENTITY-SENSOR-MIB-EXT-MIB');
     }
     echo ' entPhySensorOperStatus';
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorOperStatus', $entity_oids, 'ENTITY-SENSOR-MIB');
@@ -242,6 +250,22 @@ if (! empty($entity_oids)) {
                     }
                     // End grouping sensors
                 }
+
+                if ($device['os'] === 'xos') and (in_array($index, $xos_sensor_limit)) {
+                    if (in_array('etsysEntitySfpSensorLowAlarm', $xos_sensor_limit[$index]) {
+                        $low_limit = $xos_sensor_limit[$index]['etsysEntitySfpSensorLowAlarm'] / $divisor;
+                    }
+                    if (in_array('etsysEntitySfpSensorLowWarning', $xos_sensor_limit[$index]) {
+                        $low_warn_limit = $xos_sensor_limit[$index]['etsysEntitySfpSensorLowWarning'] / $divisor;
+                    }
+                    if (in_array('etsysEntitySfpSensorHighWarning', $xos_sensor_limit[$index]) {
+                        $warn_limit = $xos_sensor_limit[$index]['etsysEntitySfpSensorHighWarning'] / $divisor;
+                    }
+                    if (in_array('etsysEntitySfpSensorHighAlarm', $xos_sensor_limit[$index]) {
+                        $high_limit = $xos_sensor_limit[$index]['etsysEntitySfpSensorHighAlarm'] / $divisor;
+                    }
+                }
+
                 $descr = trim($descr);
                 discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
             }
